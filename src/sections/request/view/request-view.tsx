@@ -10,20 +10,18 @@ import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
 import { Modal, TextField, Card, Button, Grid } from '@mui/material';
 
-import { _users } from 'src/_mock';
+import { _prescriptions, _users } from 'src/_mock';
 import { DashboardContent } from 'src/layouts/dashboard';
 
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
 import { TableNoData } from '../table-no-data';
-import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
-
-import type { UserProps } from '../user-table-row';
+import { PrescriptionProps, RequestTableRow } from '../request-table-row';
 
 // ----------------------------------------------------------------------
 
@@ -94,8 +92,8 @@ export function RequestView() {
   //   filterName,
   // });
 
-  const dataFiltered: UserProps[] = applyFilter({
-    inputData: [],
+  const dataFiltered: PrescriptionProps[] = applyFilter({
+    inputData: _prescriptions,
     comparator: getComparator(table.order, table.orderBy),
     filterName,
   });
@@ -196,7 +194,7 @@ export function RequestView() {
               <UserTableHead
                 order={table.order}
                 orderBy={table.orderBy}
-                rowCount={0}
+                rowCount={dataFiltered.length}
                 numSelected={table.selected.length}
                 onSort={table.onSort}
                 onSelectAllRows={(checked) => table.onSelectAllRows(checked, [])}
@@ -207,33 +205,30 @@ export function RequestView() {
                   { id: 'prescription', label: 'Prescription', disableSort: true },
                   { id: 'notified', label: 'Notified', align: 'center' },
                   { id: 'pickup_time', label: 'Pickup Time', align: 'center' },
-                  { id: 'status', label: 'Status' },
-                  { id: '' },
+                  { id: '', align: 'center' },
                 ]}
               />
               <TableBody>
-                {/*{dataFiltered*/}
-                {/*  .slice(*/}
-                {/*    table.page * table.rowsPerPage,*/}
-                {/*    table.page * table.rowsPerPage + table.rowsPerPage*/}
-                {/*  )*/}
-                {/*  .map((row) => (*/}
-                {/*    <UserTableRow*/}
-                {/*      key={row.id}*/}
-                {/*      row={row}*/}
-                {/*      selected={table.selected.includes(row.id)}*/}
-                {/*      onSelectRow={() => table.onSelectRow(row.id)}*/}
-                {/*    />*/}
-                {/*  ))}*/}
+                {dataFiltered
+                  .slice(
+                    table.page * table.rowsPerPage,
+                    table.page * table.rowsPerPage + table.rowsPerPage
+                  )
+                  .map((row) => (
+                    <RequestTableRow
+                      key={row.id}
+                      row={row}
+                      selected={table.selected.includes(row.id.toString())}
+                      onSelectRow={() => table.onSelectRow(row.id.toString())}
+                    />
+                  ))}
 
-                {/* <TableEmptyRows
+                <TableEmptyRows
                   height={68}
-                  emptyRows={emptyRows(table.page, table.rowsPerPage, (_users.length))}
-                /> */}
+                  emptyRows={emptyRows(table.page, table.rowsPerPage, _users.length)}
+                />
 
-                {/* <TableNoData searchQuery='No Data Found' /> */}
-
-                {/* {notFound && <TableNoData searchQuery={filterName} />} */}
+                {notFound && <TableNoData searchQuery={filterName} />}
               </TableBody>
             </Table>
           </TableContainer>
@@ -257,7 +252,7 @@ export function RequestView() {
 
 export function useTable() {
   const [page, setPage] = useState(0);
-  const [orderBy, setOrderBy] = useState('name');
+  const [orderBy, setOrderBy] = useState('queue_id');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [selected, setSelected] = useState<string[]>([]);
   const [order, setOrder] = useState<'asc' | 'desc'>('asc');

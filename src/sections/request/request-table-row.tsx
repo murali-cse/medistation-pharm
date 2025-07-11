@@ -1,3 +1,6 @@
+import moment from 'moment';
+// import { TbCancel } from 'react-icons/tb';
+import { GiCancel } from 'react-icons/gi';
 import { useState, useCallback } from 'react';
 
 import Box from '@mui/material/Box';
@@ -15,23 +18,23 @@ import { Iconify } from 'src/components/iconify';
 
 // ----------------------------------------------------------------------
 
-export type UserProps = {
-  id: string;
+export type PrescriptionProps = {
+  id: number;
+  queue_id: number;
   name: string;
-  role: string;
-  status: string;
-  company: string;
-  avatarUrl: string;
-  isVerified: boolean;
+  phone: string;
+  prescription: string;
+  notified: boolean;
+  pickup_time: string;
 };
 
-type UserTableRowProps = {
-  row: UserProps;
+type PrescriptionTableRowProps = {
+  row: PrescriptionProps;
   selected: boolean;
   onSelectRow: () => void;
 };
 
-export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) {
+export function RequestTableRow({ row, selected, onSelectRow }: PrescriptionTableRowProps) {
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -57,25 +60,27 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
               alignItems: 'center',
             }}
           >
-            {row.name}
+            {row.queue_id}
           </Box>
         </TableCell>
 
-        <TableCell>{row.company}</TableCell>
+        <TableCell>{row.name}</TableCell>
 
-        <TableCell>{row.role}</TableCell>
+        <TableCell>{row.phone}</TableCell>
+        <TableCell>{row.prescription}</TableCell>
 
         <TableCell align="center">
-          {row.isVerified ? (
+          {row.notified ? (
             <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
           ) : (
             '-'
           )}
         </TableCell>
+        <TableCell align="center">{moment(row.pickup_time).fromNow()}</TableCell>
 
-        <TableCell>
+        {/* <TableCell>
           <Label color={(row.status === 'banned' && 'error') || 'success'}>{row.status}</Label>
-        </TableCell>
+        </TableCell> */}
 
         <TableCell align="right">
           <IconButton onClick={handleOpenPopover}>
@@ -108,8 +113,9 @@ export function UserTableRow({ row, selected, onSelectRow }: UserTableRowProps) 
           }}
         >
           <MenuItem onClick={handleClosePopover}>
-            <Iconify icon="solar:pen-bold" />
-            Edit
+            {/* <TbCancel size={18} /> */}
+            <GiCancel size={18} />
+            Cancel
           </MenuItem>
 
           <MenuItem onClick={handleClosePopover} sx={{ color: 'error.main' }}>
